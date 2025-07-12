@@ -1,19 +1,4 @@
 <script setup lang="ts">
-/* ---------- 依赖 ---------- */
-import type { QuickCommandRuntime } from '@/stores/useQuickCommands'
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Textarea } from '@/components/ui/textarea'
-import useAIConfigStore from '@/stores/AIConfig'
-import { useQuickCommands } from '@/stores/useQuickCommands'
-import { copyPlain } from '@/utils/clipboard'
-import hljs from 'highlight.js'
-
 import {
   Check,
   Copy,
@@ -25,34 +10,22 @@ import {
   Settings,
   Trash2,
 } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
+import useAIConfigStore from '@/stores/AIConfig'
+import type { QuickCommandRuntime } from '@/stores/useQuickCommands'
+import { useQuickCommands } from '@/stores/useQuickCommands'
+import { copyPlain } from '@/utils/clipboard'
 
-/* ---------- Markdown & highlight.js ---------- */
-import { Marked } from 'marked'
-import { markedHighlight } from 'marked-highlight'
-import { nextTick, onMounted, ref, watch } from 'vue'
 /* ---------- 组件属性 ---------- */
 const props = defineProps<{ open: boolean }>()
 const emit = defineEmits([`update:open`])
-// 浅色主题
-
-const aiMarked = new Marked(
-  markedHighlight({
-    highlight(code: string, lang: string) {
-      return lang && hljs.getLanguage(lang)
-        ? hljs.highlight(code, { language: lang }).value
-        : hljs.highlightAuto(code).value
-    },
-  }),
-)
-
-aiMarked.setOptions({
-  gfm: true,
-  breaks: true,
-})
-
-function renderMarkdown(text: string) {
-  return aiMarked.parse(text)
-}
 
 const store = useStore()
 const { editor } = storeToRefs(store)
@@ -500,19 +473,14 @@ async function sendMessage() {
             </div>
 
             <!-- Markdown 内容 -->
-            <div v-if="msg.content" class="space-y-2 overflow-x-auto">
-              <div
-                class="chat-markdown prose prose-sm dark:prose-invert max-w-none"
-                v-html="renderMarkdown(msg.content)"
-              />
-            </div>
-
-            <!-- 占位/加载动画 -->
             <div
-              v-else
-              class="text-muted-foreground animate-pulse whitespace-pre-wrap"
+              class="whitespace-pre-wrap"
+              :class="msg.content ? '' : 'animate-pulse text-muted-foreground'"
             >
-              {{ msg.role === 'assistant' && !msg.done ? '思考中…' : '' }}
+              {{
+                msg.content
+                  || (msg.role === 'assistant' && !msg.done ? '思考中…' : '')
+              }}
             </div>
 
             <!-- 工具按钮 -->
@@ -593,7 +561,7 @@ async function sendMessage() {
           <Button
             :disabled="!input.trim() && !loading"
             size="icon"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 absolute bottom-3 right-3 rounded-full disabled:opacity-40"
+            class="hover:bg-primary/90 bg-primary text-primary-foreground absolute bottom-3 right-3 rounded-full disabled:opacity-40"
             :aria-label="loading ? '暂停' : '发送'"
             @click="loading ? pauseStreaming() : sendMessage()"
           >

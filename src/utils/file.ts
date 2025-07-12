@@ -1,16 +1,16 @@
-import { giteeConfig, githubConfig } from '@/config'
-import fetch from '@/utils/fetch'
-import * as tokenTools from '@/utils/tokenTools'
-
-import { base64encode, safe64, utf16to8 } from '@/utils/tokenTools'
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import Buffer from 'buffer-from'
+
 import COS from 'cos-js-sdk-v5'
 import CryptoJS from 'crypto-js'
 import * as qiniu from 'qiniu-js'
 import OSS from 'tiny-oss'
 import { v4 as uuidv4 } from 'uuid'
+import { giteeConfig, githubConfig } from '@/config'
+import fetch from '@/utils/fetch'
+import * as tokenTools from '@/utils/tokenTools'
+import { base64encode, safe64, utf16to8 } from '@/utils/tokenTools'
 
 function getConfig(useDefault: boolean, platform: string) {
   if (useDefault) {
@@ -601,7 +601,7 @@ async function formCustomUpload(content: string, file: File) {
   })
 }
 
-function fileUpload(content: string, file: File) {
+export function fileUpload(content: string, file: File) {
   const imgHost = localStorage.getItem(`imgHost`)
   if (!imgHost) {
     localStorage.setItem(`imgHost`, `default`)
@@ -637,8 +637,4 @@ function fileUpload(content: string, file: File) {
       //     : ghFileUpload(content, file.name);
       return ghFileUpload(content, file.name)
   }
-}
-
-export default {
-  fileUpload,
 }

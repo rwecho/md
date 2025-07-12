@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { ArrowUpNarrowWide, ChevronsDownUp, ChevronsUpDown, PlusSquare } from 'lucide-vue-next'
 import { useStore } from '@/stores'
 import { addPrefix } from '@/utils'
-import { ArrowUpNarrowWide, ChevronsDownUp, ChevronsUpDown, PlusSquare } from 'lucide-vue-next'
 
 const store = useStore()
 
@@ -388,7 +388,7 @@ function handleDragEnd() {
             <!-- 右侧内容 -->
             <div class="space-y-2 max-h-full w-[500px] overflow-y-auto">
               <p
-                v-for="(line, idx) in (store.getPostById(currentPostId!)?.history[currentHistoryIndex].content ?? '').split('\\n')"
+                v-for="(line, idx) in (store.getPostById(currentPostId!)?.history[currentHistoryIndex].content ?? '').split('\n')"
                 :key="idx"
               >
                 {{ line }}
